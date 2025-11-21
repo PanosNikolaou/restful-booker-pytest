@@ -1,3 +1,17 @@
+"""
+End-to-end booking flow test helpers and an example CRUD test.
+
+This module defines pytest fixtures used to build and authorize API requests,
+a request helper that records request/response details for debugging, and an
+example test that performs a full create/read/update/delete flow against
+the RESTful Booker API.
+
+Note about __init__.py:
+    The tests package's __init__.py is typically empty to ensure pytest discovers
+    tests without executing package-level code. Keeping it empty avoids side-effects
+    and makes test imports deterministic.
+"""
+
 # python
 # File: `conftest.py`
 import os
@@ -18,10 +32,12 @@ _token = None
 
 @pytest.fixture(scope="session")
 def base_url():
+    """Returns the base URL for the API."""
     return BASE_URL
 
 @pytest.fixture(scope="session")
 def token():
+    """Authenticates the user and retrieves the token for subsequent requests."""
     global _token
     if _token:
         return _token
@@ -33,10 +49,12 @@ def token():
 
 @pytest.fixture
 def auth_headers(token):
+    """Returns the authorization headers for API requests."""
     return {"Content-Type": "application/json", "Cookie": f"token={token}"}
 
 @pytest.fixture
 def random_booking():
+    """Generates a random booking payload for testing."""
     return {
         "firstname": fake.first_name(),
         "lastname": fake.last_name(),
@@ -51,6 +69,9 @@ def api_request(request):
     """
     Returns a function to perform HTTP requests and record detailed
     request/response text into `request.node.crud_logs` for the current test.
+
+    The `api_request` fixture records human-readable request/response text on the
+    current pytest node (request.node.crud_logs) so reporting hooks can include it.
     """
     def _api_request(method, url, **kwargs):
         method_u = method.upper()
@@ -103,6 +124,7 @@ def pytest_runtest_makereport(item, call):
 # Example of using `api_request` in a test (update your existing test to use this)
 # File: `tests/test_e2e_booking_flow.py` (snippet)
 def test_full_crud_flow(base_url, auth_headers, random_booking, api_request):
+    """Tests the full create/read/update/delete flow for a booking."""
     # CREATE
     r = api_request("post", f"{base_url}/booking", json=random_booking, headers={"Content-Type": "application/json"})
     assert r.status_code == 200

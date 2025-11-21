@@ -1,3 +1,16 @@
+"""
+Pytest test-support utilities.
+
+Provides:
+- an autouse fixture that wraps requests.Session.request to record API calls for each test,
+  storing the details on the pytest node for later consumption by reporting hooks.
+- a pytest_runtest_makereport hook that appends captured API-call HTML to pytest-html reports.
+
+Note about __init__.py:
+    The project package __init__.py files are intentionally empty; they exist solely
+    to mark directories as importable packages and avoid executing package-level logic.
+"""
+
 import time
 import json
 import html as html_lib
@@ -72,6 +85,8 @@ def record_api_calls(request):
     # patch
     requests.Session.request = _wrap_request
 
+    # Clarification: record_api_calls attaches its list to `request.node._api_calls` so
+    # pytest hooks can read it after the test run and include the info in reports.
     # Attach to node BEFORE yielding so pytest_runtest_makereport can access it
     try:
         request.node._api_calls = calls
