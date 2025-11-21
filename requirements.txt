@@ -5,11 +5,16 @@ requests>=2.28,<3.0
 pydantic>=1.10.12,<2.0
 
 # Testing
-pytest>=7.0,<8.0
-pytest-html>=3.1.1
+# Keep a minimum pytest version but avoid strict upper bound so CI/local environments with pytest 9.x work
+pytest>=7.0
+pytest-html>=4.1.1
+pytest-metadata>=3.1.1
+
+# Allure reporting plugin used in the test output
+allure-pytest>=2.15.0
 
 # Test helpers / fixtures
 Faker>=18.9.0
 
-# Optional: typing helpers for older Python versions (uncomment if needed)
-# typing-extensions>=4.0
+# Typing helpers for older Python versions
+typing-extensions>=4.0
